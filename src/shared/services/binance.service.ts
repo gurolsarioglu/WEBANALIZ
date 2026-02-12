@@ -1,14 +1,19 @@
 import ccxt from 'ccxt';
+import { API_CONFIG } from '@/shared/config/constants';
+import type { CandleData } from '@/shared/types';
 
 // Binance client singleton
-let binanceInstance: ccxt.binance | null = null;
+let binanceInstance: InstanceType<typeof ccxt.binance> | null = null;
 
-export function getBinanceClient(): ccxt.binance {
+/**
+ * Get or create Binance client instance
+ */
+export function getBinanceClient(): InstanceType<typeof ccxt.binance> {
     if (!binanceInstance) {
         binanceInstance = new ccxt.binance({
-            enableRateLimit: true,
+            enableRateLimit: API_CONFIG.BINANCE.RATE_LIMIT,
             options: {
-                defaultType: 'future', // Use futures market by default
+                defaultType: API_CONFIG.BINANCE.DEFAULT_TYPE,
             },
         });
     }
@@ -25,21 +30,21 @@ export async function fetchOHLCV(
     symbol: string,
     timeframe: string = '1d',
     limit: number = 100
-) {
+): Promise<CandleData[]> {
     const client = getBinanceClient();
     try {
         const ohlcv = await client.fetchOHLCV(symbol, timeframe, undefined, limit);
         return ohlcv.map(candle => ({
-            timestamp: candle[0],
-            open: candle[1],
-            high: candle[2],
-            low: candle[3],
-            close: candle[4],
-            volume: candle[5],
+            timestamp: candle[0] as number,
+            open: candle[1] as number,
+            high: candle[2] as number,
+            low: candle[3] as number,
+            close: candle[4] as number,
+            volume: candle[5] as number,
         }));
     } catch (error) {
         console.error(`Error fetching OHLCV for ${symbol}:`, error);
-        throw error;
+        throw new Error(`Failed to fetch OHLCV data for ${symbol}`);
     }
 }
 
@@ -53,7 +58,7 @@ export async function fetchTicker(symbol: string) {
         return await client.fetchTicker(symbol);
     } catch (error) {
         console.error(`Error fetching ticker for ${symbol}:`, error);
-        throw error;
+        throw new Error(`Failed to fetch ticker for ${symbol}`);
     }
 }
 
@@ -73,7 +78,7 @@ export async function fetchFundingRate(symbol: string) {
         };
     } catch (error) {
         console.error(`Error fetching funding rate for ${symbol}:`, error);
-        throw error;
+        throw new Error(`Failed to fetch funding rate for ${symbol}`);
     }
 }
 
@@ -96,6 +101,6 @@ export async function fetchTopGainers(limit: number = 10) {
         }));
     } catch (error) {
         console.error('Error fetching top gainers:', error);
-        throw error;
+        throw new Error('Failed to fetch top gainers');
     }
 }

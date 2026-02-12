@@ -1,12 +1,26 @@
 import axios from 'axios';
-import { fetchTicker } from './binance-client';
+import { API_CONFIG } from '@/shared/config/constants';
+import { fetchTicker } from './binance.service';
 
-const COINGLASS_API_V2 = 'https://open-api.coinglass.com/public/v2';
+const COINGLASS_API_V2 = API_CONFIG.COINGLASS.BASE_URL;
 
 interface CoinglassLiquidationLevel {
     price: number;
     volUsd: number;
     lev?: number;
+}
+
+interface LiquidationLevels {
+    upside: {
+        price: number;
+        level: number;
+        leverage?: number;
+    };
+    downside: {
+        price: number;
+        level: number;
+        leverage?: number;
+    };
 }
 
 /**
@@ -23,7 +37,6 @@ export async function fetchLiquidationData(symbol: string) {
         const currentPrice = ticker.last || 0;
 
         // Fetch liquidation heatmap from Coinglass
-        // Using the aggregate liqHeatmap endpoint
         const response = await axios.get(
             `${COINGLASS_API_V2}/aggregate/liqHeatmap`,
             {
@@ -34,7 +47,7 @@ export async function fetchLiquidationData(symbol: string) {
                 headers: {
                     'accept': 'application/json',
                 },
-                timeout: 10000,
+                timeout: API_CONFIG.COINGLASS.TIMEOUT,
             }
         );
 
@@ -74,7 +87,7 @@ export async function fetchLiquidationData(symbol: string) {
  * Parse Coinglass heatmap data to extract high-density liquidation levels
  * Yellow/high-density areas are represented by higher volUsd values
  */
-function parseCoinglassHeatmap(heatmapData: any, currentPrice: number) {
+function parseCoinglassHeatmap(heatmapData: any, currentPrice: number): LiquidationLevels {
     try {
         // Coinglass returns data in format: { price: number, volUsd: number }[]
         const levels: CoinglassLiquidationLevel[] = heatmapData.data || [];
