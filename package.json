@@ -1,0 +1,20 @@
+{
+  "name": "nokta",
+  "version": "1.0.0",
+  "description": "Nokta Atışı Crypto Sinyal Botu - Telegram",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "npx tsx src/index.ts",
+    "dev": "npx tsx watch src/index.ts",
+    "build": "tsc",
+    "test": "npx tsx src/test.ts"
+  },
+  "dependencies": {
+    "ccxt": "^4.5.37"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "tsx": "^4.0.0",
+    "@types/node": "^20.0.0"
+  }
+}

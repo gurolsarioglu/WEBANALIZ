@@ -1,0 +1,19 @@
+/** Bot Configuration */
+export const CONFIG = {
+    LEVERAGE: 10,
+    ENTRY_AMOUNT: 2,
+    TARGET_PROFIT_PCT: 30,
+    SCAN_INTERVAL_MS: 15 * 60 * 1000,
+    SCAN_DELAY_MS: 5000,
+    RSI_LONG: 20,
+    RSI_SHORT: 80,
+    SRSI_LONG: 0,
+    SRSI_SHORT: 100,
+    SRSI_TOLERANCE: 2,
+    FR_DANGER_1: 0.01,
+    FR_DANGER_2: 0.02,
+    CANDLE_COUNT: 100,
+    BATCH_SIZE: 10,
+    BATCH_DELAY_MS: 2000,
+    SIGNAL_COOLDOWN_MS: 60 * 60 * 1000,
+};
